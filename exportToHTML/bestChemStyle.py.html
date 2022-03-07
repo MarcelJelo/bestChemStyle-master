@@ -1,0 +1,143 @@
+<html>
+<head>
+<title>bestChemStyle.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+bestChemStyle.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">time</span>
+
+<span class="s0">from </span><span class="s1">selenium </span><span class="s0">import </span><span class="s1">webdriver</span>
+<span class="s0">from </span><span class="s1">selenium.webdriver </span><span class="s0">import </span><span class="s1">Keys</span>
+<span class="s0">from </span><span class="s1">selenium.common.exceptions </span><span class="s0">import </span><span class="s1">ElementClickInterceptedException</span>
+
+<span class="s1">print(</span><span class="s2">'Hint: Program will open maximized. You can minimize the window after the browser has opened'</span><span class="s1">)</span>
+<span class="s1">player_name = input(</span><span class="s2">'Enter a player name: '</span><span class="s1">)</span>
+<span class="s1">card_type = input(</span><span class="s2">'Enter the card-type: '</span><span class="s1">)</span>
+<span class="s1">chem_or_price = int(input(</span><span class="s2">'Do you want the best Chemistry Style (1) or the price (2) of a player? =&gt; '</span><span class="s1">))</span>
+
+<span class="s0">if </span><span class="s1">chem_or_price &lt;= </span><span class="s3">0 </span><span class="s0">or </span><span class="s1">chem_or_price &gt; </span><span class="s3">2</span><span class="s1">:</span>
+    <span class="s1">print(</span><span class="s2">'Entered number not available'</span><span class="s1">)</span>
+    <span class="s1">exit()</span>
+<span class="s0">else</span><span class="s1">:</span>
+    <span class="s0">if </span><span class="s1">chem_or_price == </span><span class="s3">1</span><span class="s1">:</span>
+        <span class="s1">pref_position = input(</span><span class="s2">'Enter the position you want: '</span><span class="s1">).upper()</span>
+
+<span class="s1">option = webdriver.ChromeOptions()</span>
+
+<span class="s1">option.add_argument(</span><span class="s2">'--disable-blink-features=AutomationControlled'</span><span class="s1">)</span>
+<span class="s1">option.add_argument(</span><span class="s2">'--headless'</span><span class="s1">)</span>
+<span class="s1">option.add_argument(</span><span class="s2">&quot;--window-size=1920,1080&quot;</span><span class="s1">)</span>
+
+<span class="s1">driver = webdriver.Chrome(executable_path=</span><span class="s2">'chromedriver.exe'</span><span class="s0">,</span><span class="s1">options=option)</span>
+
+<span class="s1">driver.get(</span><span class="s2">'https://www.futbin.com/players'</span><span class="s1">)</span>
+<span class="s1">time.sleep(</span><span class="s3">1</span><span class="s1">)</span>
+
+<span class="s1">driver.save_screenshot(</span><span class="s2">'screenshot.png'</span><span class="s1">)</span>
+<span class="s1">accept_btn = driver.find_elements_by_class_name(</span><span class="s2">'css-1litn2c'</span><span class="s1">)</span>
+
+<span class="s1">s = len(accept_btn)</span>
+
+<span class="s0">if</span><span class="s1">(s &gt; </span><span class="s3">0</span><span class="s1">):</span>
+   <span class="s1">accept_btn.click()</span>
+
+<span class="s1">time.sleep(</span><span class="s3">1</span><span class="s1">)</span>
+
+<span class="s1">search_bar = driver.find_element_by_id(</span><span class="s2">'players_search'</span><span class="s1">)</span>
+<span class="s1">search_bar.send_keys(player_name + Keys.ENTER)</span>
+<span class="s1">time.sleep(</span><span class="s3">1</span><span class="s1">)</span>
+
+<span class="s1">rating_order = driver.find_element_by_xpath(</span><span class="s2">'//*[@id=&quot;repTb&quot;]/thead/tr/th[2]/a'</span><span class="s1">)</span>
+<span class="s1">rating_order.click()</span>
+
+<span class="s1">driver.execute_script(</span><span class="s2">'window.scrollTo(0, 400)'</span><span class="s1">)</span>
+
+<span class="s1">rows = driver.find_elements_by_xpath(</span><span class="s2">'//*[@id=&quot;repTb&quot;]/tbody/tr'</span><span class="s1">)</span>
+
+<span class="s1">row_amount = len(rows)</span>
+
+<span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">range(</span><span class="s3">1</span><span class="s0">, </span><span class="s1">row_amount + </span><span class="s3">1</span><span class="s1">):</span>
+    <span class="s1">current_row = driver.find_element_by_xpath(</span><span class="s2">'//*[@id=&quot;repTb&quot;]/tbody/tr['</span><span class="s1">+ str(i) +</span><span class="s2">']/td[4]'</span><span class="s1">).text</span>
+    <span class="s0">if </span><span class="s1">current_row.lower() == card_type.lower():</span>
+        <span class="s1">player_futbin = driver.find_element_by_xpath(</span>
+            <span class="s2">'/html/body/div[8]/div[2]/div[5]/div[4]/table/tbody/tr[' </span><span class="s1">+ str(i) + </span><span class="s2">']/td[1]/div[2]/div[1]/a'</span><span class="s1">)</span>
+        <span class="s0">break</span>
+
+<span class="s1">test = </span><span class="s3">0</span>
+
+<span class="s0">try</span><span class="s1">:</span>
+    <span class="s1">player_futbin.click()</span>
+<span class="s0">except </span><span class="s1">ElementClickInterceptedException:</span>
+    <span class="s1">driver.execute_script(</span><span class="s2">'window.scrollTo(0, 1050)'</span><span class="s1">)</span>
+    <span class="s1">test = </span><span class="s3">1</span>
+
+<span class="s0">if </span><span class="s1">test == </span><span class="s3">1</span><span class="s1">:</span>
+    <span class="s1">player_futbin.click()</span>
+
+<span class="s0">if </span><span class="s1">chem_or_price == </span><span class="s3">1</span><span class="s1">:</span>
+    <span class="s1">driver.execute_script(</span><span class="s2">'window.scrollTo(0, 600)'</span><span class="s1">)</span>
+    <span class="s1">driver.find_element_by_xpath(</span><span class="s2">'//*[@id=&quot;its_traits&quot;]/a'</span><span class="s1">).click()</span>
+
+    <span class="s0">for </span><span class="s1">index_position </span><span class="s0">in </span><span class="s1">range(</span><span class="s3">1</span><span class="s0">, </span><span class="s3">17</span><span class="s1">):</span>
+        <span class="s1">position = driver.find_element_by_xpath(</span><span class="s2">'//*[@id=&quot;rpp_field&quot;]/div[' </span><span class="s1">+ str(index_position) + </span><span class="s2">']/div[1]'</span><span class="s1">).text</span>
+        <span class="s0">if </span><span class="s1">position == pref_position:</span>
+            <span class="s0">break</span>
+
+    <span class="s1">best_rating = </span><span class="s3">0</span>
+    <span class="s1">best_chem_style = []</span>
+
+    <span class="s0">for </span><span class="s1">index_chemistry_style </span><span class="s0">in </span><span class="s1">range(</span><span class="s3">2</span><span class="s0">, </span><span class="s3">21</span><span class="s1">):</span>
+        <span class="s1">driver.find_element_by_xpath(</span><span class="s2">'/html/body/div[8]/div[15]/div/div/div[3]/div/div[3]/div['</span>
+                                     <span class="s1">+ str(index_chemistry_style) + </span><span class="s2">']/a'</span><span class="s1">).click()</span>
+        <span class="s1">position = driver.find_element_by_xpath(</span><span class="s2">'//*[@id=&quot;rpp_field&quot;]/div[' </span><span class="s1">+ str(index_position) + </span><span class="s2">']/div[2]'</span><span class="s1">).text</span>
+        <span class="s0">if </span><span class="s1">best_rating &lt; int(position):</span>
+            <span class="s1">best_rating = int(position)</span>
+            <span class="s1">best_chem_style.clear()</span>
+            <span class="s1">best_chem_style.append(driver.find_element_by_xpath(</span>
+                    <span class="s2">'/html/body/div[8]/div[15]/div/div/div[3]/div/div[3]/div[' </span><span class="s1">+ str(index_chemistry_style) + </span><span class="s2">']/a'</span><span class="s1">)</span>
+                                       <span class="s1">.text)</span>
+        <span class="s0">else</span><span class="s1">:</span>
+            <span class="s0">if </span><span class="s1">best_rating == int(position):</span>
+                <span class="s1">best_chem_style.append(driver.find_element_by_xpath(</span>
+                    <span class="s2">'/html/body/div[8]/div[15]/div/div/div[3]/div/div[3]/div[' </span><span class="s1">+ str(index_chemistry_style) + </span><span class="s2">']/a'</span><span class="s1">)</span>
+                                       <span class="s1">.text)</span>
+        <span class="s1">time.sleep(</span><span class="s3">0.5</span><span class="s1">)</span>
+
+    <span class="s1">print(</span><span class="s2">'Best Chemistry style for ' </span><span class="s1">+ player_name + </span><span class="s2">' ' </span><span class="s1">+ card_type + </span><span class="s2">' card is/are: ' </span><span class="s1">+</span>
+          <span class="s1">str(best_chem_style).strip(</span><span class="s2">'[]'</span><span class="s1">) + </span><span class="s2">' with a rating of ' </span><span class="s1">+ str(best_rating))</span>
+<span class="s0">else</span><span class="s1">:</span>
+    <span class="s0">if </span><span class="s1">chem_or_price == </span><span class="s3">2</span><span class="s1">:</span>
+        <span class="s1">price_ps = driver.find_elements_by_xpath(</span>
+            <span class="s2">'/html/body/div[8]/div[13]/div[2]/div[2]/div/div[2]/div[2]/div/div[12]/div[1]'</span><span class="s1">)</span>
+        <span class="s1">s = len(price_ps)</span>
+
+        <span class="s0">if </span><span class="s1">(s &gt; </span><span class="s3">0</span><span class="s1">):</span>
+            <span class="s1">price_ps = driver.find_element_by_xpath(</span>
+            <span class="s2">'/html/body/div[8]/div[13]/div[2]/div[2]/div/div[2]/div[2]/div/div[12]/div[1]'</span><span class="s1">).text</span>
+            <span class="s1">price_xbox = driver.find_element_by_xpath(</span>
+                <span class="s2">'/html/body/div[8]/div[13]/div[2]/div[2]/div/div[2]/div[3]/div/div[12]/div[1]'</span><span class="s1">).text</span>
+            <span class="s1">price_pc = driver.find_element_by_xpath(</span>
+                <span class="s2">'/html/body/div[8]/div[13]/div[2]/div[2]/div/div[2]/div[4]/div/div[12]/div[1]'</span><span class="s1">).text</span>
+        <span class="s0">else</span><span class="s1">:</span>
+            <span class="s1">price_ps = driver.find_element_by_xpath(</span><span class="s2">'//*[@id=&quot;ps-lowest-1&quot;]'</span><span class="s1">).text</span>
+            <span class="s1">price_xbox = driver.find_element_by_xpath(</span><span class="s2">'//*[@id=&quot;xbox-lowest-1&quot;]'</span><span class="s1">).text</span>
+            <span class="s1">price_pc = driver.find_element_by_xpath(</span><span class="s2">'//*[@id=&quot;pc-lowest-1&quot;]'</span><span class="s1">).text</span>
+
+        <span class="s1">print(</span><span class="s2">'The price of ' </span><span class="s1">+ card_type + </span><span class="s2">' ' </span><span class="s1">+ player_name + </span><span class="s2">' is:</span><span class="s0">\n</span><span class="s2">' </span><span class="s1">+ price_ps +</span>
+              <span class="s2">' coins (PS)</span><span class="s0">\n</span><span class="s2">' </span><span class="s1">+ price_xbox + </span><span class="s2">' coins (XBox)</span><span class="s0">\n</span><span class="s2">' </span><span class="s1">+ price_pc + </span><span class="s2">' coins (PC)'</span><span class="s1">)</span>
+
+<span class="s1">driver.close()</span>
+</pre>
+</body>
+</html>
